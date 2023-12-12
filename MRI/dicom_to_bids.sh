@@ -70,7 +70,7 @@ done
 #     '/mridata/cbu/CBU090928_MR09029'
 # )
 
-# Check if the heuristic file exists
+# Check if the heuristic file exists. If not, add to the error output log (that's what >&2 does) and exit the script.
 if [ ! -f "$HEURISTIC_FILE" ]; then
     echo "Heuristic file not found: ${HEURISTIC_FILE}. Exiting..." >&2
     exit 1
@@ -86,7 +86,7 @@ echo "Processing subject ${subject} (${cbu_code})..."
 # Get the path to the raw data for the current job
 RAW_PATH="${RAW_PATH_LIST[$SLURM_ARRAY_TASK_ID]}"
 
-# Check if the raw data path exists. If not, add to the error output log (that's what >&2 does) and exit the script.
+# Check if the raw data path exists. 
 if [ ! -d "$RAW_PATH" ]; then
     echo "Raw data path for ${cbu_code} not found. Exiting..." >&2
     exit 1
