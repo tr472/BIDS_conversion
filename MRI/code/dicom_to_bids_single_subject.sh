@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # ============================================================
-# Discovering DICOM files into BIDS format using Heudiconv
+#
+# Converting CBU DICOM files into BIDS format using Heudiconv
+#
 # ============================================================
 
 # Your project's root directory
@@ -10,11 +12,14 @@ PROJECT_PATH='/imaging/correia/da05/wiki/BIDS_conversion/MRI'
 # Location of the raw data
 RAW_PATH='/mridata/cbu/CBU090942_MR09029'
 
-# Location of the output data (it will be created if it doesn't exist)
-OUTPUT_PATH=$PROJECT_PATH/data/work/dicom_discovery/
+# Location of the output data
+OUTPUT_PATH=$PROJECT_PATH/data/
 
 # Subject ID
 subject="01"
+
+# Location of the heudiconv heuristic file
+HEURISTIC_FILE="${PROJECT_PATH}/bids_heuristic.py"
 
 # Load the apptainer module
 module load apptainer
@@ -25,9 +30,9 @@ apptainer run --cleanenv \
     /imaging/local/software/singularity_images/heudiconv/heudiconv_latest.sif \
     --files "${RAW_PATH}"/*/*/*.dcm \
     --outdir "$OUTPUT_PATH" \
-    --heuristic convertall \
+    --heuristic "${HEURISTIC_FILE}" \
     --subjects "${subject}" \
-    --converter none \
+    --converter dcm2niix \
     --bids \
     --overwrite
 

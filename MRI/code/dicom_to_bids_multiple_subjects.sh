@@ -27,29 +27,27 @@
 # ------------------------------------------------------------
 # Your project's root directory
 PROJECT_PATH="/imaging/correia/da05/wiki/BIDS_conversion/MRI"
+
 # Location of the output data
 OUTPUT_PATH=$PROJECT_PATH/data/
+
 # Your MRI project code, to locate your data
 PROJECT_CODE="MR09029"
+
 # List of subject CBU codes as they appear in the /mridata/cbu/ folder
 SUBJECT_CBU_CODES=(
-    "CBU090942" # Subject 01
     "CBU090938" # Subject 02
     "CBU090964" # Subject 03
     "CBU090928" # Subject 04
 )
 
 # Create a list of subject IDs as they will appear in the BIDS dataset
-SUBJECT_LIST=(01 02 03 04)
-# If your subject IDs are from 01 to [number of items in the SUBJECT_CBU_CODES], you can generate this list automatically 
-# using the following command:
-# SUBJECT_LIST=($(seq -f "%02g" 1 ${#RAW_PATH_LIST[@]}))
+SUBJECT_LIST=(02 03 04)
 
 # Location of the heudiconv heuristic file
 HEURISTIC_FILE="${PROJECT_PATH}/bids_heuristic.py"
 
 # ------------------------------------------------------------
-
 
 
 # ------------------------------------------------------------
@@ -64,7 +62,6 @@ for subject in "${SUBJECT_CBU_CODES[@]}"; do
 done
 # The above loop is equivalent to:
 # RAW_PATH_LIST=(
-#     '/mridata/cbu/CBU090942_MR09029'
 #     '/mridata/cbu/CBU090938_MR09029'
 #     '/mridata/cbu/CBU090964_MR09029'
 #     '/mridata/cbu/CBU090928_MR09029'
@@ -93,7 +90,6 @@ if [ ! -d "$RAW_PATH" ]; then
 fi
 
 # Load the apptainer module
-module purge # Unload any existing modules to avoid conflicts
 module load apptainer
 
 # Check if the module was loaded successfully

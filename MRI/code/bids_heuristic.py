@@ -16,21 +16,6 @@ def create_key(template, outtype=('nii.gz',), annotation_classes=None):
 # --------------------------------------------------------------------------------------
 
 # --------------------------------------------------------------------------------------
-# Dictionary to specify options to populate the 'IntendedFor' field of the fmap jsons.
-#
-# See https://heudiconv.readthedocs.io/en/latest/heuristics.html#populate-intended-for-opts
-#
-# If POPULATE_INTENDED_FOR_OPTS is not present in the heuristic file, IntendedFor will not be populated automatically.
-# --------------------------------------------------------------------------------------
-POPULATE_INTENDED_FOR_OPTS = {
-    'matching_parameters': ['ModalityAcquisitionLabel'],
-    'criterion': 'Closest'
-}
-# 'ModalityAcquisitionLabel': it checks for what modality (anat, func, dwi) each fmap is 
-# intended by checking the _acq- label in the fmap filename and finding corresponding 
-# modalities (e.g. _acq-fmri, _acq-bold and _acq-func will be matched with the func modality)
-
-# --------------------------------------------------------------------------------------
 # infotodict: A function to assist in creating the dictionary, and to be used inside heudiconv.
 # This is a required function for heudiconv to run.
 #
@@ -44,16 +29,23 @@ def infotodict(seqinfo):
     # See https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
     
     # The structural/anatomical scan
-    anat = create_key('sub-{subject}/anat/sub-{subject}_T1w')
+    anat = create_key(
+        'sub-{subject}/anat/sub-{subject}_T1w'
+        )
     
     # The fieldmap scans
-    fmap_mag = create_key('sub-{subject}/fmap/sub-{subject}_acq-func_magnitude')
-    fmap_phase = create_key('sub-{subject}/fmap/sub-{subject}_acq-func_phasediff')
+    fmap_mag = create_key(
+        'sub-{subject}/fmap/sub-{subject}_acq-func_magnitude'
+        )
+    fmap_phase = create_key(
+        'sub-{subject}/fmap/sub-{subject}_acq-func_phasediff'
+        )
     
     # The functional scans
     # You need to specify the task name in the filename. It must be a single string of letters WITHOUT spaces, underscores, or dashes!
     func_task = create_key(
-        'sub-{subject}/func/sub-{subject}_task-facerecognition_run-0{item:01d}_bold')
+        'sub-{subject}/func/sub-{subject}_task-facerecognition_run-0{item:01d}_bold'
+        )
     
     # Create the dictionary that will be returned by this function.
     info = {
@@ -85,3 +77,18 @@ def infotodict(seqinfo):
             
     # Return the dictionary
     return info
+
+# --------------------------------------------------------------------------------------
+# Dictionary to specify options to populate the 'IntendedFor' field of the fmap jsons.
+#
+# See https://heudiconv.readthedocs.io/en/latest/heuristics.html#populate-intended-for-opts
+#
+# If POPULATE_INTENDED_FOR_OPTS is not present in the heuristic file, IntendedFor will not be populated automatically.
+# --------------------------------------------------------------------------------------
+POPULATE_INTENDED_FOR_OPTS = {
+    'matching_parameters': ['ModalityAcquisitionLabel'],
+    'criterion': 'Closest'
+}
+# 'ModalityAcquisitionLabel': it checks for what modality (anat, func, dwi) each fmap is 
+# intended by checking the _acq- label in the fmap filename and finding corresponding 
+# modalities (e.g. _acq-fmri, _acq-bold and _acq-func will be matched with the func modality)
