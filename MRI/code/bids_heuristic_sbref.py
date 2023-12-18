@@ -16,21 +16,6 @@ def create_key(template, outtype=('nii.gz',), annotation_classes=None):
 # --------------------------------------------------------------------------------------
 
 # --------------------------------------------------------------------------------------
-# Dictionary to specify options to populate the 'IntendedFor' field of the fmap jsons.
-#
-# See https://heudiconv.readthedocs.io/en/latest/heuristics.html#populate-intended-for-opts
-#
-# If POPULATE_INTENDED_FOR_OPTS is not present in the heuristic file, IntendedFor will not be populated automatically.
-# --------------------------------------------------------------------------------------
-POPULATE_INTENDED_FOR_OPTS = {
-    'matching_parameters': ['ModalityAcquisitionLabel'],
-    'criterion': 'Closest'
-}
-# 'ModalityAcquisitionLabel': it checks for what modality (anat, func, dwi) each fmap is 
-# intended by checking the _acq- label in the fmap filename and finding corresponding 
-# modalities (e.g. _acq-fmri, _acq-bold and _acq-func will be matched with the func modality)
-
-# --------------------------------------------------------------------------------------
 # infotodict: A function to assist in creating the dictionary, and to be used inside heudiconv.
 # This is a required function for heudiconv to run.
 #
@@ -55,9 +40,9 @@ def infotodict(seqinfo):
     # The functional scans
     # You need to specify the task name in the filename. It must be a single string of letters WITHOUT spaces, underscores, or dashes!
     func_task = create_key(
-        'sub-{subject}/func/sub-{subject}_task-video_run-0{item:01d}_bold')
+        'sub-{subject}/func/sub-{subject}_task-video_run-{item:02d}_bold')
     func_sbref = create_key(
-        'sub-{subject}/func/sub-{subject}_task-video_run-0{item:01d}_sbref')
+        'sub-{subject}/func/sub-{subject}_task-video_run-{item:02d}_sbref')
     
     # Create the dictionary that will be returned by this function.
     info = {
@@ -99,10 +84,10 @@ def infotodict(seqinfo):
             info[fmap_sbref].append(s.series_id)
 
         # Functional Reference (sbref)
-        if (s.dim1 == 64) and (s.dim4 == 1) and ("MB2_AP_2" in s.protocol_name):
+        if (s.dim4 == 1) and ("MB2_AP_2" in s.protocol_name):
             latest_sbref = s.series_id
         # Functional Bold
-        elif (s.dim1 == 64) and (s.dim4 > 100):
+        elif s.dim4 > 100:
             info[func_task].append(s.series_id)
             # Only if functional is added, adds the latest sbref 
             # (e.g., avoids adding sbref if func is less than 100 volumes which would indicate a cancelled run)
@@ -122,3 +107,18 @@ def infotodict(seqinfo):
             
     # Return the dictionary
     return info
+
+# --------------------------------------------------------------------------------------
+# Dictionary to specify options to populate the 'IntendedFor' field of the fmap jsons.
+#
+# See https://heudiconv.readthedocs.io/en/latest/heuristics.html#populate-intended-for-opts
+#
+# If POPULATE_INTENDED_FOR_OPTS is not present in the heuristic file, IntendedFor will not be populated automatically.
+# --------------------------------------------------------------------------------------
+POPULATE_INTENDED_FOR_OPTS = {
+    'matching_parameters': ['ModalityAcquisitionLabel'],
+    'criterion': 'Closest'
+}
+# 'ModalityAcquisitionLabel': it checks for what modality (anat, func, dwi) each fmap is 
+# intended by checking the _acq- label in the fmap filename and finding corresponding 
+# modalities (e.g. _acq-fmri, _acq-bold and _acq-func will be matched with the func modality)

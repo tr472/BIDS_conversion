@@ -44,7 +44,7 @@ def infotodict(seqinfo):
     # The functional scans
     # You need to specify the task name in the filename. It must be a single string of letters WITHOUT spaces, underscores, or dashes!
     func_task = create_key(
-        'sub-{subject}/func/sub-{subject}_task-facerecognition_run-0{item:01d}_bold'
+        'sub-{subject}/func/sub-{subject}_task-facerecognition_run-{item:02d}_bold'
         )
     
     # Create the dictionary that will be returned by this function.
@@ -72,7 +72,7 @@ def infotodict(seqinfo):
             info[fmap_phase].append(s.series_id)
 
         # Functional Bold
-        if (s.dim1 == 64) and (s.dim4 > 100):
+        if s.dim4 > 100:
            info[func_task].append(s.series_id)
             
     # Return the dictionary

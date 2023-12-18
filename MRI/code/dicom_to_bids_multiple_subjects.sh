@@ -17,7 +17,7 @@
 #SBATCH --job-name=heudiconv_%a
 #SBATCH --output=/imaging/correia/da05/wiki/BIDS_conversion/MRI/data/work/heudiconv_job_%A_%a.out
 #SBATCH --error=/imaging/correia/da05/wiki/BIDS_conversion/MRI/data/work/heudiconv_job_%A_%a.err
-#SBATCH --array=0  # Adjust the array range to match the number of subjects, in this case 4 (indexed from 0)
+#SBATCH --array=0-2  # Adjust the array range to match the number of subjects, in this case 3 (indexed from 0)
 
 # SLURM will create separate tasks for each array index (each subject). The SLURM_ARRAY_TASK_ID (used later in the script)
 # will correspond to the subject index. SLURM will handle the parallelization across the specified array range.
@@ -45,7 +45,7 @@ SUBJECT_CBU_CODES=(
 SUBJECT_LIST=(02 03 04)
 
 # Location of the heudiconv heuristic file
-HEURISTIC_FILE="${PROJECT_PATH}/bids_heuristic.py"
+HEURISTIC_FILE="${PROJECT_PATH}//code/bids_heuristic.py"
 
 # ------------------------------------------------------------
 

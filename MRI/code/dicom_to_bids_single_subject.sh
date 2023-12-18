@@ -16,10 +16,10 @@ RAW_PATH='/mridata/cbu/CBU090942_MR09029'
 OUTPUT_PATH=$PROJECT_PATH/data/
 
 # Subject ID
-subject="01"
+subject="09"
 
 # Location of the heudiconv heuristic file
-HEURISTIC_FILE="${PROJECT_PATH}/bids_heuristic.py"
+HEURISTIC_FILE="${PROJECT_PATH}/code/bids_heuristic.py"
 
 # Load the apptainer module
 module load apptainer
