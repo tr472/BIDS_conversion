@@ -29,10 +29,10 @@
 PROJECT_PATH="/imaging/correia/da05/wiki/BIDS_conversion/MRI"
 
 # Location of the output data
-OUTPUT_PATH=$PROJECT_PATH/data/
+OUTPUT_PATH="${PROJECT_PATH}/data/"
 
 # Your MRI project code, to locate your data
-PROJECT_CODE="MR09029"
+PROJECT_CODE='MR09029'
 
 # List of subject CBU codes as they appear in the /mridata/cbu/ folder
 SUBJECT_CBU_CODES=(
@@ -45,7 +45,7 @@ SUBJECT_CBU_CODES=(
 SUBJECT_LIST=(02 03 04)
 
 # Location of the heudiconv heuristic file
-HEURISTIC_FILE="${PROJECT_PATH}//code/bids_heuristic.py"
+HEURISTIC_FILE="${PROJECT_PATH}/code/bids_heuristic.py"
 
 # ------------------------------------------------------------
 
@@ -67,7 +67,13 @@ done
 #     '/mridata/cbu/CBU090928_MR09029'
 # )
 
-# Check if the heuristic file exists. If not, add to the error output log (that's what >&2 does) and exit the script.
+# Check if the RAW_PATH_LIST is empty. If so, add to the error output log (that's what >&2 does) and exit the script.
+if [ -z "$RAW_PATH_LIST" ]; then
+    echo "No raw data paths found. Exiting..." >&2
+    exit 1
+fi
+
+# Check if the heuristic file exists. If not, exit the script.
 if [ ! -f "$HEURISTIC_FILE" ]; then
     echo "Heuristic file not found: ${HEURISTIC_FILE}. Exiting..." >&2
     exit 1
@@ -83,8 +89,9 @@ echo "Processing subject ${subject} (${cbu_code})..."
 # Get the path to the raw data for the current job
 RAW_PATH="${RAW_PATH_LIST[$SLURM_ARRAY_TASK_ID]}"
 
-# Check if the raw data path exists. 
+# Check if the raw data path exists. If not, exit the script.
 if [ ! -d "$RAW_PATH" ]; then
+    echo "Raw path: ${RAW_PATH}" >&2
     echo "Raw data path for ${cbu_code} not found. Exiting..." >&2
     exit 1
 fi
@@ -103,7 +110,7 @@ apptainer run --cleanenv \
     --bind "${PROJECT_PATH},${RAW_PATH},${HEURISTIC_FILE}" \
     /imaging/local/software/singularity_images/heudiconv/heudiconv_latest.sif \
     --files "${RAW_PATH}"/*/*/*.dcm \
-    --outdir "$OUTPUT_PATH" \
+    --outdir "${OUTPUT_PATH}" \
     --heuristic "${HEURISTIC_FILE}" \
     --subjects "${subject}" \
     --converter dcm2niix \

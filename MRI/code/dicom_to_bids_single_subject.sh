@@ -13,10 +13,10 @@ PROJECT_PATH='/imaging/correia/da05/wiki/BIDS_conversion/MRI'
 RAW_PATH='/mridata/cbu/CBU090942_MR09029'
 
 # Location of the output data
-OUTPUT_PATH=$PROJECT_PATH/data/
+OUTPUT_PATH="${PROJECT_PATH}/data/"
 
 # Subject ID
-subject="09"
+subject='09'
 
 # Location of the heudiconv heuristic file
 HEURISTIC_FILE="${PROJECT_PATH}/code/bids_heuristic.py"
@@ -29,7 +29,7 @@ apptainer run --cleanenv \
     --bind "${PROJECT_PATH},${RAW_PATH}" \
     /imaging/local/software/singularity_images/heudiconv/heudiconv_latest.sif \
     --files "${RAW_PATH}"/*/*/*.dcm \
-    --outdir "$OUTPUT_PATH" \
+    --outdir "${OUTPUT_PATH}" \
     --heuristic "${HEURISTIC_FILE}" \
     --subjects "${subject}" \
     --converter dcm2niix \
