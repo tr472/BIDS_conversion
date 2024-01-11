@@ -29,7 +29,6 @@ HEURISTIC_FILE="${PROJECT_PATH}/code/bids_heuristic.py"
 # Activate the heudiconv environment
 # ------------------------------------------------------------
 conda activate heudiconv
-# ------------------------------------------------------------
 
 # ------------------------------------------------------------
 # Run the heudiconv

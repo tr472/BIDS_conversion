@@ -18,13 +18,15 @@ OUTPUT_PATH="${PROJECT_PATH}/data/work/dicom_discovery/"
 # Subject ID
 subject='01'
 
-# Load the apptainer module
-module load apptainer
+# ------------------------------------------------------------
+# Activate the heudiconv environment
+# ------------------------------------------------------------
+conda activate heudiconv
 
-# Run the container
-apptainer run --cleanenv \
-    --bind "${PROJECT_PATH},${RAW_PATH}" \
-    /imaging/local/software/singularity_images/heudiconv/heudiconv_latest.sif \
+# ------------------------------------------------------------
+# Run the heudiconv
+# ------------------------------------------------------------
+heudiconv \
     --files "${RAW_PATH}"/*/*/*.dcm \
     --outdir "${OUTPUT_PATH}" \
     --heuristic convertall \
@@ -32,6 +34,7 @@ apptainer run --cleanenv \
     --converter none \
     --bids \
     --overwrite
+# ------------------------------------------------------------
 
-# Unload the apptainer module
-module unload apptainer
+# Deactivate the heudiconv environment
+conda deactivate
