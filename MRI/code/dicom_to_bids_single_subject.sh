@@ -28,9 +28,7 @@ HEURISTIC_FILE="${PROJECT_PATH}/code/bids_heuristic.py"
 # ------------------------------------------------------------
 # Activate the heudiconv environment
 # ------------------------------------------------------------
-CONDA_ENV_PATH="/imaging/local/software/miniconda/envs/heudiconv"
-source /imaging/local/software/miniconda/etc/profile.d/conda.sh
-conda activate "$CONDA_ENV_PATH"
+conda activate heudiconv
 # ------------------------------------------------------------
 
 # ------------------------------------------------------------
@@ -45,3 +43,6 @@ heudiconv \
     --bids \
     --overwrite
 # ------------------------------------------------------------
+
+# Deactivate the heudiconv environment
+conda deactivate
