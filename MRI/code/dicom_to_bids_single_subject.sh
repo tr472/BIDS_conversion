@@ -2,7 +2,10 @@
 
 # ============================================================
 #
-# Converting CBU DICOM files into BIDS format using Heudiconv
+# This script converts a single subject's DICOM files to BIDS
+# 
+# Usage: 
+#    Configure the variables below and run the script: ./dicom_to_bids_single_subject.sh
 #
 # ============================================================
 
@@ -10,20 +13,17 @@
 # Define your variables
 # ------------------------------------------------------------
 
-# Your project's root directory
-PROJECT_PATH='/imaging/correia/da05/wiki/BIDS_conversion/MRI'
-
-# Location of the raw data
-RAW_PATH='/mridata/cbu/CBU090942_MR09029'
+# Path to the raw DICOM files
+DICOM_PATH='/mridata/cbu/CBU090942_MR09029'
 
 # Location of the output data
-OUTPUT_PATH="${PROJECT_PATH}/data/"
-
-# Subject ID
-subject='01'
+OUTPUT_PATH='/imaging/correia/da05/wiki/BIDS_conversion/MRI/data/'
 
 # Location of the heudiconv heuristic file
-HEURISTIC_FILE="${PROJECT_PATH}/code/bids_heuristic.py"
+HEURISTIC_FILE='/imaging/correia/da05/wiki/BIDS_conversion/MRI/code/bids_heuristic.py'
+
+# Subject ID
+SUBJECT_ID='01'
 
 # ------------------------------------------------------------
 # Activate the heudiconv environment
@@ -34,10 +34,10 @@ conda activate heudiconv # This assumes you have a conda environment called heud
 # Run the heudiconv
 # ------------------------------------------------------------
 heudiconv \
-    --files "${RAW_PATH}"/*/*/*.dcm \
+    --files "${DICOM_PATH}"/*/*/*.dcm \
     --outdir "${OUTPUT_PATH}" \
     --heuristic "${HEURISTIC_FILE}" \
-    --subjects "${subject}" \
+    --subjects "${SUBJECT_ID}" \
     --converter dcm2niix \
     --bids \
     --overwrite

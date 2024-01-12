@@ -3,9 +3,11 @@
 # ============================================================
 # Requires Python 3.6 or higher! (because of f-strings)
 #
-# Converting CBU DICOM files into BIDS format using Heudiconv
+# This script is used to convert multiple subjects from DICOM to BIDS.
+# The script calls the 'heudiconv_script.sh' bash script for each subject in the SUBJECT_LIST.
 #
-# Run the script with this command: sbatch dicom_to_bids_multiple_subjects.py
+# Usage:
+#   Configure the variables below and run the script with SLURM: sbatch dicom_to_bids_multiple_subjects.py
 #
 # ============================================================
 
@@ -41,6 +43,9 @@ import subprocess # To run shell commands
 
 # Your project's root directory
 PROJECT_PATH = '/imaging/correia/da05/wiki/BIDS_conversion/MRI'
+
+# Location of the heudiconv_script bash script
+HEUDICONV_SCRIPT = f"{PROJECT_PATH}/code/heudiconv_script.sh"
 
 # Location of the output data
 OUTPUT_PATH = f"{PROJECT_PATH}/data/"
@@ -97,31 +102,13 @@ if not os.path.isdir(dicom_path):
     sys.stderr.write(f"Raw data path for {cbu_code} not found. Exiting...\n")
     sys.exit(1)
 
-# Activate the heudiconv environment and run heudiconv
-CONDA_ENV = "heudiconv" # This assumes you have a conda environment called heudiconv available (check with 'conda env list'). If not, create one with the heudiconv and dcm2niix packages installed.
-heudiconv_cmd = (
-    f"conda run -n {CONDA_ENV} "
-    f"heudiconv --heuristic {HEURISTIC_FILE} --files {dicom_path}/*/*/*.dcm --subjects {subject_id} --converter dcm2niix --outdir {OUTPUT_PATH} --bids --overwrite"
+# Call and run the heudiconv_script bash script
+command = (
+    f"{HEUDICONV_SCRIPT} {dicom_path} {OUTPUT_PATH} {HEURISTIC_FILE} {subject_id}"
 )
-
-# Execute the command
-subprocess.run(heudiconv_cmd, shell=True, check=True)
+subprocess.run(command, shell=True, check=True)
 
 # ------------------------------------------------------------
 # End of processing for the current subject
 # ------------------------------------------------------------
 print(f"Processing of subject {subject_id} ({cbu_code}) finished.")
-
-# ============================================================
-# HeudiConv parameters:
-# --files: Files or directories containing files to process
-# --outdir: Output directory
-# --heuristic: Name of a known heuristic or path to the Python script containing heuristic
-# --subjects: Subject ID
-# --converter : dicom to nii converter (dcm2niix or none)
-# --bids: Flag for output into BIDS structure
-# --overwrite: Flag to overwrite existing files
-# 
-# For a full list of parameters, see: https://heudiconv.readthedocs.io/en/latest/usage.html 
-#
-# ============================================================

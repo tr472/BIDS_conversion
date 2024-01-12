@@ -1,36 +1,40 @@
 #!/bin/bash
 
 # ============================================================
+# This script is used to discover DICOM files using HeuDiConv.
 #
-# Discovering DICOM files using HeuDiConv
+# Usage: ./dicom_discover.sh
+# 
+# It is assumed that you have a conda environment called 'heudiconv' available (check with 'conda env list'). 
+# If not, create a conda environment with the heudiconv and dcm2niix packages installed.
 #
 # ============================================================
 
 # Your project's root directory
 PROJECT_PATH='/imaging/correia/da05/wiki/BIDS_conversion/MRI'
 
-# Location of the raw data
-RAW_PATH='/mridata/cbu/CBU090942_MR09029'
+# Path to the raw DICOM files
+DICOM_PATH='/mridata/cbu/CBU090942_MR09029'
 
 # Location of the output data (it will be created if it doesn't exist)
 OUTPUT_PATH="${PROJECT_PATH}/data/work/dicom_discovery/"
 
 # Subject ID
-subject='01'
+SUBJECT_ID='01'
 
 # ------------------------------------------------------------
 # Activate the heudiconv environment
 # ------------------------------------------------------------
-conda activate heudiconv # This assumes you have a conda environment called heudiconv available (check with 'conda env list'). If not, create one with the heudiconv and dcm2niix packages installed.
+conda activate heudiconv
 
 # ------------------------------------------------------------
 # Run the heudiconv
 # ------------------------------------------------------------
 heudiconv \
-    --files "${RAW_PATH}"/*/*/*.dcm \
+    --files "${DICOM_PATH}"/*/*/*.dcm \
     --outdir "${OUTPUT_PATH}" \
     --heuristic convertall \
-    --subjects "${subject}" \
+    --subjects "${SUBJECT_ID}" \
     --converter none \
     --bids \
     --overwrite

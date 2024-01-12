@@ -4,12 +4,13 @@
 #
 # Converting CBU DICOM files into BIDS format using Heudiconv
 #
-# Run the script with this command: sbatch dicom_to_bids_multiple_subjects.sh
+# Usage: 
+#   Configure the variables below and run the script with SLURM: sbatch dicom_to_bids_multiple_subjects.sh
 #
 # ============================================================
 
 # ------------------------------------------------------------
-# SLURM job configurationdicom_path
+# SLURM job configuration
 #
 # !Edit the SBATCH variables as needed!
 # !The output and error directories must exist before running the script!
@@ -59,7 +60,7 @@ SUBJECT_LIST["04"]="CBU090928"
 # You don't have to change anything below this line!
 #
 # It is assumed that your raw data is located in DICOM_ROOT/{cbu_code}_{PROJECT_CODE}
-# If you want to change this, edit the dicom_path variable below and possibly the SUBJECT_LIST above
+# If you want to change this, edit the DICOM_PATH variable below and possibly the SUBJECT_LIST above
 # ------------------------------------------------------------
 
 # ------------------------------------------------------------
@@ -76,7 +77,7 @@ subject_id=${subject_ids[$((SLURM_ARRAY_TASK_ID - 1))]}  # Subtract 1 because ba
 cbu_code=${SUBJECT_LIST[$subject_id]}
 
 # Get the path to the raw data for the current job
-dicom_path="${DICOM_ROOT}/${cbu_code}_${PROJECT_CODE}"
+DICOM_PATH="${DICOM_ROOT}/${cbu_code}_${PROJECT_CODE}"
 
 # ------------------------------------------------------------
 # Start the processing of the current subject
@@ -92,8 +93,8 @@ if [ ! -f "$HEURISTIC_FILE" ]; then
 fi
 
 # Check if the raw data path exists. If not, exit the script.
-if [ ! -d "$dicom_path" ]; then
-    echo "Raw path: ${dicom_path}" >&2
+if [ ! -d "$DICOM_PATH" ]; then
+    echo "Raw path: ${DICOM_PATH}" >&2
     echo "Raw data path for ${cbu_code} not found. Exiting..." >&2
     exit 1
 fi
@@ -102,7 +103,7 @@ fi
 conda activate heudiconv # This assumes you have a conda environment called heudiconv available (check with 'conda env list'). If not, create one with the heudiconv and dcm2niix packages installed.
 
 heudiconv \
-    --files "${dicom_path}"/*/*/*.dcm \
+    --files "${DICOM_PATH}"/*/*/*.dcm \
     --outdir "$OUTPUT_PATH" \
     --heuristic "${HEURISTIC_FILE}" \
     --subjects "${subject_id}" \
