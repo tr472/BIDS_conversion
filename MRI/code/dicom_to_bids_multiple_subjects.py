@@ -7,31 +7,14 @@
 # The script calls the 'heudiconv_script.sh' bash script for each subject in the SUBJECT_LIST.
 #
 # Usage:
-#   Configure the variables below and run the script with SLURM: sbatch dicom_to_bids_multiple_subjects.py
+#   Configure the variables below and run the script: ./dicom_to_bids_multiple_subjects.py
 #
 # ============================================================
 
 # ------------------------------------------------------------
-# SLURM job configuration
-#
-# !Edit the SBATCH variables as needed!
-# !The output and error directories must exist before running the script!
-# ------------------------------------------------------------
-
-#SBATCH --job-name=heudiconv_%a
-#SBATCH --output=/imaging/correia/da05/wiki/BIDS_conversion/MRI/data/work/heudiconv_job_%A_%a.out
-#SBATCH --error=/imaging/correia/da05/wiki/BIDS_conversion/MRI/data/work/heudiconv_job_%A_%a.err
-#SBATCH --array=1-3
-
-# ------------------------------------------------------------
-# SLURM will handle the parallelization across the specified array range.
-# SLURM will create separate tasks for each array index.
-# The SLURM_ARRAY_TASK_ID will be used later in the script to select a subject from subjects list. 
-
-# ------------------------------------------------------------
 # Import packages
 # ------------------------------------------------------------
-import os # To get environment variables
+import os # To check if files and folders exist
 import sys # To exit the script in case of error
 import subprocess # To run shell commands
 
@@ -47,7 +30,7 @@ PROJECT_PATH = '/imaging/correia/da05/wiki/BIDS_conversion/MRI'
 # Location of the heudiconv_script bash script
 HEUDICONV_SCRIPT = f"{PROJECT_PATH}/code/heudiconv_script.sh"
 
-# Location of the output data
+# Location of the output data (Heudiconv will create the folder if it doesn't exist)
 OUTPUT_PATH = f"{PROJECT_PATH}/data/"
 
 # Location of the heudiconv heuristic file
@@ -67,48 +50,72 @@ SUBJECT_LIST= {
 }
 # ------------------------------------------------------------
 
-
 # ------------------------------------------------------------
 # You don't have to change anything below this line!
 #
-# It is assumed that your raw data is located in /mridata/cbu/{cbu_code}_{PROJECT_CODE}
+# It is assumed that your raw data are located in /mridata/cbu/{cbu_code}_{PROJECT_CODE}
 # If you want to change this, edit the dicom_path variable below and possibly the SUBJECT_LIST above
 # ------------------------------------------------------------
 
 # ------------------------------------------------------------
-# Get the current subject data
+# Set up other variables needed for the script
 # ------------------------------------------------------------
-# SLURM Array Task ID
-task_id = int(os.environ.get('SLURM_ARRAY_TASK_ID', 0))
 
-# Get the subject's ID and CBU code
-subject_id, cbu_code = list(SUBJECT_LIST.items())[task_id-1] # -1 because SLURM_ARRAY_TASK_ID starts at 1, but python lists start at 0
+# Get the subject IDs and CBU codes from the SUBJECT_LIST
+subject_ids = list(SUBJECT_LIST.keys())
+cbu_codes = list(SUBJECT_LIST.values())
 
-# Get the path to the raw data
-dicom_path = f"{DICOM_ROOT}/{cbu_code}_{PROJECT_CODE}"
+# Get the paths to the raw data for each subject
+dicom_paths = [f"{DICOM_ROOT}/{code}_{PROJECT_CODE}" for code in cbu_codes]
 
+# Convert subject and dicom lists to space-separated strings as needed for the bash script
+subject_ids_list = ' '.join(subject_ids)
+dicom_paths_list = ' '.join(dicom_paths)
+
+# Get the number of subjects to know how many jobs to submit
+n_subjects = len(SUBJECT_LIST)  
+
+# Specify and create a folder for the job logs
+JOB_OUTPUT_PATH = f"{OUTPUT_PATH}/job_logs"
+if not os.path.isdir(JOB_OUTPUT_PATH):
+    os.makedirs(JOB_OUTPUT_PATH)
+ 
 # ------------------------------------------------------------
-# Start the processing of the current subject
+# Do some checks before running the script
 # ------------------------------------------------------------
-print(f"Processing subject {subject_id} ({cbu_code})...")
 
 # Check if the heuristic file exists. If not, exit the script.
 if not os.path.isfile(HEURISTIC_FILE):
     sys.stderr.write(f"Heuristic file not found: {HEURISTIC_FILE}. Exiting...\n")
     sys.exit(1)
 
-# Check if the raw data path exists. If not, exit the script.
-if not os.path.isdir(dicom_path):
-    sys.stderr.write(f"Raw data path for {cbu_code} not found. Exiting...\n")
+# Check if all dicom paths exist. If not, print out which doesn't and exit the script.
+for dicom_path in dicom_paths:
+    if not os.path.isdir(dicom_path):
+        sys.stderr.write(f"Dicom path not found: {dicom_path}. Exiting...\n")
+        sys.exit(1)
+
+# Check if the heudiconv_script exists. If not, exit the script.
+if not os.path.isfile(HEUDICONV_SCRIPT):
+    sys.stderr.write(f"Heudiconv script not found: {HEUDICONV_SCRIPT}. Exiting...\n")
     sys.exit(1)
 
-# Call and run the heudiconv_script bash script
-command = (
-    f"{HEUDICONV_SCRIPT} {dicom_path} {OUTPUT_PATH} {HEURISTIC_FILE} {subject_id}"
+# ------------------------------------------------------------
+# Construct a command to submit a job array to SLURM
+# It will call the heudiconv_script.sh script for each subject and generate a unique task ID.
+# The heudiconv_script will use the task ID to get the subject ID and the path to the raw data from the passed subject and dicom lists.
+# ------------------------------------------------------------
+    
+bash_command = (
+    f"sbatch --array=0-{n_subjects - 1} "
+    f"--job-name=heudiconv "
+    f"--output={JOB_OUTPUT_PATH}/heudiconv_job_%A_%a.out "
+    f"--error={JOB_OUTPUT_PATH}/heudiconv_job_%A_%a.err "
+    f"{HEUDICONV_SCRIPT} '{subject_ids_list}' '{dicom_paths_list}' '{HEURISTIC_FILE}' '{OUTPUT_PATH}'"
 )
-subprocess.run(command, shell=True, check=True)
+
+subprocess.run(bash_command, shell=True, check=True)
 
 # ------------------------------------------------------------
-# End of processing for the current subject
+# End of script
 # ------------------------------------------------------------
-print(f"Processing of subject {subject_id} ({cbu_code}) finished.")

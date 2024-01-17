@@ -2,18 +2,21 @@
 
 # ============================================================
 # This script runs the HeuDiConv tool to convert DICOM files to NIfTI files and organize them into a BIDS structure.
-#
-# Usage:
-#   ./heudiconv_script.sh <DICOM_PATH> <OUTPUT_PATH> <HEURISTIC_FILE> <SUBJECT_ID>
-#
+# The script is designed to be run on a SLURM cluster.
+# 
+# Usage: sbatch heudiconv_script.sh <subject_id_list> <dicom_path_list> <heuristic_file> <output_path>
+# 
 # Arguments:
-#   DICOM_PATH: Path to the raw DICOM files
-#   OUTPUT_PATH: Path to the output directory
-#   HEURISTIC_FILE: Path to the heuristic file
-#   SUBJECT_ID: Subject ID
+#   <subject_id_list> is a list of subject IDs to process, separated by spaces
+#   <dicom_path_list> is a list of paths to the DICOM files for each subject, separated by spaces
+#   <heuristic_file> is the name of the heuristic file to use (e.g. heuristic.py)
+#   <output_path> is the path to the output directory
 #
-# Example:
-#   ./heudiconv_script.sh /home/username/data/dicom /home/username/data/bids /home/username/code/heuristic.py 01
+# Notes:
+#   <subject_id_list> and <dicom_path_list> should be the same length.
+# 
+# Example usage: 
+#   sbatch --array=0-1 heudiconv_script.sh "01 02" "/path/to/dicom/sub-01 /path/to/dicom/sub-02" heuristic.py /path/to/output
 #
 # It is assumed that you have a conda environment called 'heudiconv' available (check with 'conda env list'). 
 # If not, create a conda environment with the heudiconv and dcm2niix packages installed.
@@ -23,10 +26,27 @@
 # ------------------------------------------------------------
 # Parse the arguments passed to the script
 # ------------------------------------------------------------
-DICOM_PATH="${1}"
-OUTPUT_PATH="${2}"
+SUBJECT_ID_LIST=($1)
+DICOM_PATH_LIST=($2)
 HEURISTIC_FILE="${3}"
-SUBJECT_ID="${4}"
+OUTPUT_PATH="${4}"
+
+# ------------------------------------------------------------
+# Get the SLURM job task ID
+# ------------------------------------------------------------
+task_id=$SLURM_ARRAY_TASK_ID
+
+# ------------------------------------------------------------
+# Set the DICOM path and subject ID for this task
+# ------------------------------------------------------------
+SUBJECT_ID=${SUBJECT_ID_LIST[$task_id]}
+DICOM_PATH=${DICOM_PATH_LIST[$task_id]}
+
+# ------------------------------------------------------------
+# Print out some information about the script (it will be saved in the SLURM output file)
+# ------------------------------------------------------------
+echo "Processing subject ${SUBJECT_ID}"
+echo "DICOM path: ${DICOM_PATH}"
 
 # ------------------------------------------------------------
 # Activate the heudiconv environment

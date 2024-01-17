@@ -13,12 +13,12 @@
 # SLURM job configuration
 #
 # !Edit the SBATCH variables as needed!
-# !The output and error directories must exist before running the script!
+# !The job output and error directories must exist before running the script!
 # ------------------------------------------------------------
 
 #SBATCH --job-name=heudiconv_%a
-#SBATCH --output=/imaging/correia/da05/wiki/BIDS_conversion/MRI/data/work/heudiconv_job_%A_%a.out
-#SBATCH --error=/imaging/correia/da05/wiki/BIDS_conversion/MRI/data/work/heudiconv_job_%A_%a.err
+#SBATCH --output=/imaging/correia/da05/wiki/BIDS_conversion/MRI/data/job_logs/heudiconv_job_%A_%a.out
+#SBATCH --error=/imaging/correia/da05/wiki/BIDS_conversion/MRI/data/job_logs/heudiconv_job_%A_%a.err
 #SBATCH --array=1-3 # Adjust the array range to match which subjects you want to process
 
 # ------------------------------------------------------------
