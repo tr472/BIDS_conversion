@@ -11,16 +11,17 @@
 # ============================================================
 
 # Your project's root directory
-PROJECT_PATH='/imaging/correia/da05/wiki/BIDS_conversion/MRI'
+PROJECT_PATH='/imaging/projects/cbu/CamCAN_harmonisation/'
+#add bin to path directory
 
 # Path to the raw DICOM files
-DICOM_PATH='/mridata/cbu/CBU090942_MR09029'
+DICOM_PATH='/mridata/cbu/CBU140905_CAMCAN_CALIBRATIONS'
 
 # Location of the output data (it will be created if it doesn't exist)
-OUTPUT_PATH="${PROJECT_PATH}/data/work/dicom_discovery/"
+OUTPUT_PATH="${PROJECT_PATH}/imaging/TravelingHeads_BIDS"
 
 # Subject ID
-SUBJECT_ID='01'
+SUBJECT_ID='13'
 
 # ------------------------------------------------------------
 # Activate the heudiconv environment

@@ -5,7 +5,8 @@
 # Converting CBU DICOM files into BIDS format using Heudiconv
 #
 # Usage: 
-#   Configure the variables below and run the script with SLURM: sbatch dicom_to_bids_multiple_subjects.sh
+#   1) Configure the variables below
+#   2) Run the script with SLURM: sbatch dicom_to_bids_multiple_subjects.sh
 #
 # ============================================================
 
@@ -17,14 +18,17 @@
 # ------------------------------------------------------------
 
 #SBATCH --job-name=heudiconv_%a
-#SBATCH --output=/imaging/correia/da05/wiki/BIDS_conversion/MRI/data/job_logs/heudiconv_job_%A_%a.out
-#SBATCH --error=/imaging/correia/da05/wiki/BIDS_conversion/MRI/data/job_logs/heudiconv_job_%A_%a.err
+#SBATCH --output=/imaging/correia/da05/wiki/BIDS_conversion/MRI/code/job_logs/heudiconv_job_%A_%a.out
+#SBATCH --error=/imaging/correia/da05/wiki/BIDS_conversion/MRI/code/job_logs/heudiconv_job_%A_%a.err
 #SBATCH --array=1-3 # Adjust the array range to match which subjects you want to process
 
 # ------------------------------------------------------------
 # SLURM will handle the parallelization across the specified array range.
 # SLURM will create separate tasks for each array index.
-# The SLURM_ARRAY_TASK_ID will be used later in the script to select a subject from subjects list. 
+# The SLURM_ARRAY_TASK_ID will be used later in the script to select a subject from subjects list.
+
+
+sbatch --array=0-2 --job-name=heudiconv {HEUDICONV_SCRIPT} '{subject_ids_list}' '{dicom_paths_list}' '{HEURISTIC_FILE}' '{OUTPUT_PATH}'
 
 # ------------------------------------------------------------
 #
@@ -33,31 +37,44 @@
 # ------------------------------------------------------------
 
 # Your project's root directory
-PROJECT_PATH='/imaging/correia/da05/wiki/BIDS_conversion/MRI'
+PROJECT_PATH='/imaging/cbu/CAMCAN_Harmonisation/TravelingHeads_BIDS'
 
 # Location of the output data
 OUTPUT_PATH="${PROJECT_PATH}/data/"
 
 # Location of the heudiconv heuristic file
-HEURISTIC_FILE="${PROJECT_PATH}/code/bids_heuristic.py"
+HEURISTIC_FILE='imaging/cbu/CAMCAN_Harmonisation/AllCode/BIDS_conversion/MRI/code/bids_heuristic.py'
 
 # Root location of dicom files
 DICOM_ROOT='/mridata/cbu'
 
 # Your MRI project code, to locate your data
-PROJECT_CODE='MR09029'
+PROJECT_CODE='CAMCAN_CALIBRATIONS'
 
 # List of subject IDs and their corresponding CBU codes as they appear in the DICOM_ROOT folder
 declare -A SUBJECT_LIST
-SUBJECT_LIST["02"]="CBU090938" # sub-id how to appear in BIDS and CBU code as in raw dicom folder
-SUBJECT_LIST["03"]="CBU090964"
-SUBJECT_LIST["04"]="CBU090928"
-
+   SUBJECT_LIST["1"]= "CBU140905"
+   SUBJECT_LIST["2"]= "CBU140910"
+   SUBJECT_LIST["3"]= "CBU140913"
+   SUBJECT_LIST["4"]= "CBU140928"
+   SUBJECT_LIST["5"]= "CBU140931"
+   SUBJECT_LIST["6"]= "CBU140953"
+   SUBJECT_LIST["7"]= "CBU140962"
+   SUBJECT_LIST["8"]= "CBU140979"
+   SUBJECT_LIST["9"]= "CBU140982"
+   SUBJECT_LIST["10"]= "CBU140984"
+   SUBJECT_LIST["11"]= "CBU150062"
+   SUBJECT_LIST["12"]= "CBU150057"
+   SUBJECT_LIST["13"]= "CBU150056"
+   SUBJECT_LIST["14"]= "CBU150239"
+   SUBJECT_LIST["15"]= "CBU150060"
+   SUBJECT_LIST["16"]= "CBU150074"
+   SUBJECT_LIST["17"]= "CBU150124"
+   SUBJECT_LIST["18"]= "CBU150080"
+   SUBJECT_LIST["19"]= "CBU150303"
+   SUBJECT_LIST["20"]= "CBU150082"
 # ------------------------------------------------------------
-
-
-# ------------------------------------------------------------
-# You don't have to change anything below this line!
+# You don't have to change anything below this line!)
 #
 # It is assumed that your raw data is located in DICOM_ROOT/{cbu_code}_{PROJECT_CODE}
 # If you want to change this, edit the DICOM_PATH variable below and possibly the SUBJECT_LIST above

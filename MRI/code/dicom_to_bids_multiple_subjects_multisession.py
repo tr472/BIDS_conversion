@@ -1,5 +1,6 @@
 #!/usr/bin/env /usr/bin/python3.6
-
+# Modified on 30Jan by Tanvi Rao
+# This file has been modified to include multiple scanning sessions in addition to Subject ID
 # ============================================================
 # Requires Python 3.6 or higher! (because of f-strings)
 #
@@ -28,13 +29,13 @@ import subprocess # To run shell commands
 PROJECT_PATH = '/imaging/projects/cbu/CamCAN_harmonisation'
 
 # Location of the heudiconv_script bash script
-HEUDICONV_SCRIPT = f"{PROJECT_PATH}/AllCode/BIDS_conversion/MRI/code/heudiconv_script.sh"
+HEUDICONV_SCRIPT = f"{PROJECT_PATH}/AllCode/BIDS_conversion/MRI/code/heudiconv_script_multisession.sh"
 
 # Location of the output data (Heudiconv will create the folder if it doesn't exist)
-OUTPUT_PATH = f"{PROJECT_PATH}/TravelingHeads_BIDS/data/"
+OUTPUT_PATH = f"{PROJECT_PATH}/TravelingHeads_BIDS/data2/"
 
 # Location of the heudiconv heuristic file
-HEURISTIC_FILE = f"{PROJECT_PATH}/AllCode/BIDS_conversion/MRI/code/bids_heuristic.py"
+HEURISTIC_FILE = f"{PROJECT_PATH}/AllCode/BIDS_conversion/MRI/code/bids_heuristic_multisession.py"
 
 # Root location of dicom files
 DICOM_ROOT = '/mridata/cbu'
@@ -45,28 +46,26 @@ PROJECT_CODE = 'CAMCAN_CALIBRATIONS'
 # List of subject IDs and their corresponding CBU codes as they appear in the DICOM_ROOT folder
 # The subject IDs are formatted using BIDS convention as follows
 #      s
-SUBJECT_LIST= {
-    '13_TRIO_1':  'CBU140905',
-    '14_TRIO_1':  'CBU140910',
-    '15_TRIO_1':  'CBU140913',
-    '16_TRIO_1':  'CBU140928',
-    '17_TRIO_1':  'CBU140931',
-    '13_TRIO_2':  'CBU140953',
-    '14_TRIO_2':  'CBU140962',
-    '15_TRIO_2':  'CBU140979',
-    '16_TRIO_2':  'CBU140982',
-    '17_TRIO_2':  'CBU140984',
-    '13_PRISMA_1':  'CBU150062',
-    '14_PRISMA_1':  'CBU150057',
-    '15_PRISMA_1':  'CBU150056',
-    '16_PRISMA_1':  'CBU150239',
-    '17_PRISMA_1':  'CBU150060',
-    '13_PRISMA_2':  'CBU150074',
-    '14_PRISMA_2':  'CBU150124',
-    '15_PRISMA_2':  'CBU150080',
-    '16_PRISMA_2':  'CBU150303',
-    '17_PRISMA_2':  'CBU150082',
-}
+CBU_CODE_LIST = [
+    'CBU140905', 'CBU140910', 'CBU140913', 'CBU140928', 'CBU140931',
+    'CBU140953', 'CBU140962', 'CBU140979', 'CBU140982', 'CBU140984',
+    'CBU150062', 'CBU150057', 'CBU150056', 'CBU150239', 'CBU150060',
+    'CBU150074', 'CBU150124', 'CBU150080', 'CBU150303', 'CBU150082'
+]
+
+SUBJECT_LIST = [
+    '13', '14', '15', '16', '17',
+    '13', '14', '15', '16', '17',
+    '13', '14', '15', '16', '17',
+    '13', '14', '15', '16', '17'
+]
+
+SESSION_LIST = [
+    'TRIO1', 'TRIO1', 'TRIO1', 'TRIO1', 'TRIO1',
+    'TRIO2', 'TRIO2', 'TRIO2', 'TRIO2', 'TRIO2',
+    'PRISMA1', 'PRISMA1', 'PRISMA1', 'PRISMA1', 'PRISMA1',
+    'PRISMA2', 'PRISMA2', 'PRISMA2', 'PRISMA2', 'PRISMA2'
+]
 # ------------------------------------------------------------
 
 # ------------------------------------------------------------
@@ -80,19 +79,16 @@ SUBJECT_LIST= {
 # Set up other variables needed for the script
 # ------------------------------------------------------------
 
-# Get the subject IDs and CBU codes from the SUBJECT_LIST
-subject_ids = list(SUBJECT_LIST.keys())
-cbu_codes = list(SUBJECT_LIST.values())
-
 # Get the paths to the raw data for each subject
-dicom_paths = [f"{DICOM_ROOT}/{code}_{PROJECT_CODE}" for code in cbu_codes]
+dicom_paths = [f"{DICOM_ROOT}/{code}_{PROJECT_CODE}" for code in CBU_CODE_LIST]
 
 # Convert subject and dicom lists to space-separated strings as needed for the bash script
-subject_ids_list = ' '.join(subject_ids)
+subject_ids_list = ' '.join(SUBJECT_LIST)
+session_ids_list = ' '.join(SESSION_LIST)
 dicom_paths_list = ' '.join(dicom_paths)
 
 # Get the number of subjects to know how many jobs to submit
-n_subjects = len(SUBJECT_LIST)  
+n_subjects = len(SUBJECT_LIST)
 
 # Specify and create a folder for the job logs
 JOB_OUTPUT_PATH = f"{OUTPUT_PATH}/job_logs"
@@ -130,7 +126,7 @@ bash_command = (
     f"--job-name=heudiconv "
     f"--output={JOB_OUTPUT_PATH}/heudiconv_job_%A_%a.out "
     f"--error={JOB_OUTPUT_PATH}/heudiconv_job_%A_%a.err "
-    f"{HEUDICONV_SCRIPT} '{subject_ids_list}' '{dicom_paths_list}' '{HEURISTIC_FILE}' '{OUTPUT_PATH}'"
+    f"{HEUDICONV_SCRIPT} '{subject_ids_list}' '{session_ids_list}' '{dicom_paths_list}' '{HEURISTIC_FILE}' '{OUTPUT_PATH}'"
 )
 
 subprocess.run(bash_command, shell=True, check=True)

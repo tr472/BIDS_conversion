@@ -1,0 +1,11 @@
+NFO: Running heudiconv version 1.0.1 latest 1.0.1
+INFO: Analyzing 2690 dicoms
+INFO: Generated sequence info for 1 studies with 24 entries total
+WARNING: Heuristic is missing an `infotoids` method, assigning empty method and using provided subject id 13. Provide `session` and `locator` fields for best results.
+INFO: Study session for StudySessionInfo(locator=None, session=None, subject='13')
+INFO: Need to process 1 study sessions
+INFO: PROCESSING STARTS: {'subject': '13', 'outdir': '/imaging/projects/cbu/CamCAN_harmonisation/AllCode/BIDS_conversion/MRI/imaging/projects/cbu/CamCAN_harmonisation/TravelingHeads_BIDS/', 'session': None}
+INFO: Processing 24 pre-sorted seqinfo entries
+INFO: Populating template files under /imaging/projects/cbu/CamCAN_harmonisation/AllCode/BIDS_conversion/MRI/imaging/projects/cbu/CamCAN_harmonisation/TravelingHeads_BIDS/
+INFO: PROCESSING DONE: {'subject': '13', 'outdir': '/imaging/projects/cbu/CamCAN_harmonisation/AllCode/BIDS_conversion/MRI/imaging/projects/cbu/CamCAN_harmonisation/TravelingHeads_BIDS/', 'session': None}
+

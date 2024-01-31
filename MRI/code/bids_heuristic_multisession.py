@@ -1,3 +1,6 @@
+# Modified 30Jan24 by Tanvi Rao (tr03)
+# This file has been modified to allow for multiple sessions for each subject
+#
 # Heuristic for converting DICOMs to BIDS using heudiconv
 # This file is used by heudiconv to convert DICOMs to BIDS format.
 # It is called by heudiconv using the -f (or --heuristic) flag, e.g.:
@@ -30,7 +33,7 @@ def infotodict(seqinfo):
     
     # The structural/anatomical scan
     anat = create_key(
-        'sub-{subject}/anat/sub-{subject}_ses-{_T1w'
+        'sub-{subject}/{session}/anat/sub-{subject}_{session}_T1w'
         )
     
     # The fieldmap scans
